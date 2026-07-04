@@ -67,7 +67,7 @@ Developed and executed modular PowerShell scripts (available in the `/scripts` d
   * **Script:** [`inactive_users.ps1`](scripts/inactive_users.ps1)
 
 **Bulk User Creation (Onboarding):**
-![PowerShell Create Users](images/powershell_create_users.jpg)
+![PowerShell Create Users](images/powershell_create_users.png)
 
 **Active User Reporting (Export):**
 ![PowerShell Report](images/powershell_raport.png)

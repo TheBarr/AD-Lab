@@ -67,7 +67,7 @@ Napisałem i wdrożyłem modułowe skrypty PowerShell (dostępne w katalogu `/sc
   * **Skrypt:** [`inactive_users.ps1`](scripts/inactive_users.ps1)
 
 **Masowe tworzenie użytkowników (Onboarding):**
-![Tworzenie Użytkowników PowerShell](images/powershell_create_users.jpg)
+![Tworzenie Użytkowników PowerShell](images/powershell_create_users.png)
 
 **Raportowanie aktywnych użytkowników (Eksport):**
 ![Raport PowerShell](images/powershell_raport.png)
