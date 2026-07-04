@@ -12,7 +12,7 @@ Głównym celem tego laboratorium jest zaprezentowanie praktycznych umiejętnoś
 ![Schemat Architektury Sieci](images/Diagram.png)
 
 ### Specyfikacja środowiska:
-* **Hipernadzorca:** Oracle VirtualBox
+* **Hypervisor:** Oracle VirtualBox
 * **Podsieć:** `192.168.10.0/24` (Sieć wewnętrzna)
 * **Kontroler Domeny:** Windows Server 2022 (Statyczny IP: `192.168.10.10`)
 * **Stacje robocze:** Windows 11 i Ubuntu Linux (Dynamiczne IP przydzielane z DHCP)
