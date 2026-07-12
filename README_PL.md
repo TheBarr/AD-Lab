@@ -85,3 +85,12 @@ Skonfigurowałem hybrydowe środowisko IT, integrując lokalne Active Directory 
 
 **Weryfikacja lokalna (Operacje usługi synchronizacji Entra Connect):**
 ![Lokalna Usługa Synchronizacji](images/entra_connect_synchro.png)
+
+### 7. Monitorowanie Infrastruktury (Zabbix)
+Wdrożyłem system Zabbix do aktywnego monitorowania kondycji, wydajności i dostępności kontrolera domeny oraz stacji roboczych.
+* **Automatyzacja wdrażania agenta:** Skonfigurowałem ciche, automatyczne wdrażanie agenta Zabbix Agent na stacjach klienckich Windows za pomocą obiektów zasad grupy (GPO) i niestandardowego skryptu startowego (.bat).
+* **Monitorowanie usług:** Wykorzystałem mechanizmy automatycznego wykrywania (LLD) oraz wbudowane szablony do szczegółowego monitorowania kluczowych usług i alertowania.
+  * **Skrypt:** [`ZabbixInstall.bat`](scripts/ZabbixInstall.bat)
+
+**Panel Zabbix i Monitorowanie Hostów:**
+![Monitorowanie Zabbix](images/zabbix_monitoring.png)

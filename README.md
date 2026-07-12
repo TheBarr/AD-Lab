@@ -85,3 +85,12 @@ Configured a hybrid IT environment by integrating the on-premises Active Directo
 
 **On-Premises Verification (Synchronization Service Operations):**
 ![Local Sync Service](images/entra_connect_synchro.png)
+
+### 7. Infrastructure Monitoring (Zabbix)
+Deployed Zabbix to actively monitor the health, performance, and availability of the domain controller and client workstations.
+* **Automated Agent Deployment:** Configured automated, silent deployment of Zabbix Agent to Windows client machines using Group Policy Objects (GPO) and a custom startup batch script.
+* **Service Monitoring:** Utilized low-level discovery and applied specific Microsoft templates for deep-dive service monitoring and alerting.
+  * **Script:** [`ZabbixInstall.bat`](scripts/ZabbixInstall.bat)
+
+**Zabbix Dashboard & Host Monitoring:**
+![Zabbix Monitoring](images/zabbix_monitoring.png)
