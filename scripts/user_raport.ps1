@@ -20,11 +20,9 @@ Import-Module ActiveDirectory
 Write-Host "Trwa generowanie raportu z Active Directory..." -ForegroundColor Cyan
 
 try {
-    # 1. Pobieramy tylko (aktywne) konta
     $users = Get-ADUser -Filter {Enabled -eq $true} -SearchBase $SearchBase -Properties GivenName, Surname, EmailAddress
 
     if ($users) {
-        # 2. Formatujemy dane i wyrzucamy do pliku CSV
         $users | Select-Object GivenName, Surname, SamAccountName, EmailAddress | Export-Csv -Path $OutputPath -NoTypeInformation -Encoding UTF8 -Delimiter ";"
         
         Write-Host "Sukces! Raport wygenerowano i zapisano na pulpicie: $OutputPath" -ForegroundColor Green

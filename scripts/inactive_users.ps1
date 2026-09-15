@@ -18,13 +18,11 @@ param (
 
 Import-Module ActiveDirectory
 
-# Obliczanie daty granicznej (Dzis minus 90 dni)
 $cutoffDate = (Get-Date).AddDays(-$DaysInactive)
  
 Write-Host "Szukam kont nieaktywnych od: $cutoffDate" -ForegroundColor Cyan
 
 try {
-    # Pobieranie tylko aktywnych uzytkownikow, ktorzy logowali sie wczesniej niz data graniczna
     $inactiveUsers = Get-ADUser -Filter {LastLogonDate -lt $cutoffDate -and Enabled -eq $true} -SearchBase $SearchBase -Properties LastLogonDate
     
     if ($null -eq $inactiveUsers -or $inactiveUsers.Count -eq 0) {
