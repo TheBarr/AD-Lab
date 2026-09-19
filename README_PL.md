@@ -1,4 +1,3 @@
-```markdown
 # AD-Lab — Active Directory, Entra ID i Zabbix
 
 Domowe laboratorium, które zbudowałem do nauki administracji systemami IT. Skonfigurowałem domenę Active Directory, usługi sieciowe, zarządzanie stacjami przez GPO, synchronizację kont z Microsoft Entra ID oraz monitoring Zabbix. Powtarzalne zadania związane z kontami użytkowników przećwiczyłem w PowerShell.
@@ -65,4 +64,3 @@ Zrzut: [monitoring w Zabbix](images/zabbix_monitoring.png).
 Przykłady działania: [tworzenie kont](images/powershell_create_users.png), [raport CSV](images/powershell_raport.png), [wyłączanie kont](images/powershell_inactive_users.png).
 
 Skrypty przygotowałem na potrzeby laboratorium.
-```
