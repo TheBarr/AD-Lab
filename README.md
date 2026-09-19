@@ -1,96 +1,70 @@
-# Enterprise IT Infrastructure & Hybrid Identity Lab
+```markdown
+# AD-Lab — Active Directory, Entra ID and Zabbix
 
-## Project Overview
-This project is a comprehensive simulation of a corporate IT infrastructure built from the ground up. I designed, deployed, and administered a multi-platform virtual network using Windows Server 2022, Windows 11, and Ubuntu Linux. 
+[Wersja polska](README_PL.md)
 
-The primary objective of this lab is to demonstrate practical, hands-on experience in system administration, network configuration, centralized identity management, and automated software deployment in a heterogeneous environment.
+A home lab I built to practise IT administration. I configured an Active Directory domain, network services, workstation management through Group Policy, account synchronisation with Microsoft Entra ID, and Zabbix monitoring. I also wrote PowerShell scripts for routine user account tasks.
 
----
+## Environment
 
-## Architecture & Topology
+- **Virtualisation:** Oracle VirtualBox
+- **Operating systems:** Windows Server 2022, Windows 11, Ubuntu Linux
+- **Local network:** `192.168.10.0/24`
+- **Domain controller:** `192.168.10.10`
+- **Lab domain:** `bartek.com`
 
-![Network Architecture Diagram](images/Diagram.png)
+![Network diagram](images/Diagram.png)
 
-### Environment Specifications:
-* **Hypervisor:** Oracle VirtualBox
-* **Network Subnet:** `192.168.10.0/24` (Internal Network)
-* **Domain Controller:** Windows Server 2022 (Static IP: `192.168.10.10`)
-* **Client Workstations:** Windows 11 & Ubuntu Linux (Dynamic IPs via DHCP)
-* **Domain Name:** `bartek.com`
+### Active Directory and network services
 
----
+- Set up an AD DS domain controller.
+- Created an OU structure for users, administrative accounts, service accounts, and workstations.
+- Created user accounts and security groups.
+- Configured DNS and authorised a DHCP server with the address range `192.168.10.100–192.168.10.200`.
 
-## Key Implementations & Technologies
+Screenshots: [AD structure](images/ad_structure.png), [DHCP scope](images/dhcp_scope.png), [DHCP leases](images/dhcp_leases.png), [DNS](images/dns.png).
 
-### 1. Active Directory Domain Services (AD DS)
-Designed a logical, Enterprise-grade Organizational Unit (OU) structure to effectively separate administrative accounts, service accounts, workstations, and departmental users (e.g., IT, HR, Video Department).
-* Created and managed user lifecycles, security groups, and organizational units.
+### Group Policy and shared resources
 
-![Active Directory Structure](images/ad_structure.png)
+- Configured Google Chrome deployment through Group Policy using an MSI package.
+- Set up automatic mapping of the `Z:` network drive.
+- Configured share and NTFS permissions for shared resources.
 
-### 2. Core Network Services (DHCP & DNS)
-Configured core networking roles to ensure seamless communication and dynamic IP allocation across the domain.
-* **DHCP Configuration:** Authorized a DHCP server with a defined IPv4 scope (`192.168.10.100` - `192.168.10.200`) to automatically assign IP addresses to client machines.
-* **DNS Configuration:** Maintained Forward Lookup Zones ensuring accurate A-record resolution for Windows clients and statically added Linux hosts.
+Screenshots: [software deployment](images/gpo_chrome.png), [drive mapping](images/mapped_drive.png).
 
-**DHCP Scope & Leases:**
-![DHCP Scope](images/dhcp_scope.png)
-![DHCP Leases](images/dhcp_leases.png)
+### Ubuntu domain integration
 
-**DNS Records:**
-![DNS Configuration](images/dns.png)
+- Joined Ubuntu to Active Directory using `realmd` and `sssd`.
+- Verified login with a domain account.
 
-### 3. Group Policy Objects (GPO) & Automation
-Implemented centralized management policies to standardize the environment, automate administrative tasks, and improve user experience (UX).
-* **Software Deployment:** Configured silent, automated network installation of software (Google Chrome `.msi`) to all machines within the Workstations OU.
-* **Resource Sharing:** Automated the mapping of corporate network drives (Drive `Z:`) using Group Policy Preferences (Drive Maps) combined with strict NTFS and Share permissions.
+Screenshot: [Ubuntu domain integration](images/ubuntu_ad.png).
 
-**GPO Drive Mapping Configuration:**
-![Mapped Drive GPO](images/mapped_drive.png)
+### Microsoft Entra ID synchronisation
 
-**GPO Automated Software Deployment:**
-![Software Deployment GPO](images/gpo_chrome.png)
+- Installed and configured Microsoft Entra Connect Sync.
+- Synchronised user accounts from selected OUs to Entra ID.
+- Checked synchronisation results locally and in the Entra admin centre.
 
-### 4. Cross-Platform Integration (Linux & Windows)
-Successfully configured a heterogeneous network by joining an Ubuntu Linux workstation to the Microsoft Active Directory domain.
-* Utilized `realmd` and `sssd` packages to allow seamless Linux logins using centralized AD domain credentials, proving cross-platform system administration capabilities.
+Screenshots: [Entra Connect Sync](images/entra_connect_synchro.png), [accounts in Entra ID](images/entra_id.png).
 
-![Ubuntu Domain Join](images/ubuntu_ad.png)
+### Zabbix monitoring
 
-### 5. Identity Lifecycle Automation (PowerShell)
-Developed and executed modular PowerShell scripts (available in the `/scripts` directory) to automate the entire employee identity lifecycle, demonstrating efficiency and security awareness.
-* **Onboarding (Provisioning):** Automated bulk creation of user accounts from `.csv` files, standardizing naming conventions, UPNs, and assigning them to proper OUs.
-  * **Script:** [`Create_ADusers.ps1`](scripts/Create_ADusers.ps1)
-* **Reporting (Auditing):** Created a data pipeline to export clean, formatted `.csv` reports of active employees for HR and management audits.
-  * **Script:** [`user_raport.ps1`](scripts/user_raport.ps1)
-* **Offboarding (Security Audit):** Built a security script to identify and automatically disable stale/inactive accounts, reducing the attack surface and appending timestamped notes for other administrators.
-  * **Script:** [`inactive_users.ps1`](scripts/inactive_users.ps1)
+- Set up monitoring for the domain controller and workstations.
+- Configured Zabbix Agent deployment on Windows through a Group Policy startup script.
+- Used templates and low-level discovery to monitor services and flag problems.
 
-**Bulk User Creation (Onboarding):**
-![PowerShell Create Users](images/powershell_create_users.png)
+Screenshot: [Zabbix monitoring](images/zabbix_monitoring.png).
 
-**Active User Reporting (Export):**
-![PowerShell Report](images/powershell_raport.png)
+## Scripts
 
-**Stale Account Cleanup (Security Audit):**
-![PowerShell Inactive Users](images/powershell_inactive_users.png)
+| Script | Purpose |
+| --- | --- |
+| [Create_ADusers.ps1](scripts/Create_ADusers.ps1) | Creates accounts from a CSV file in a specified OU, generates usernames, and requires a password change at first login. Skips existing usernames. |
+| [user_raport.ps1](scripts/user_raport.ps1) | Exports enabled accounts from a specified OU to CSV, including first name, surname, username, and email address. |
+| [inactive_users.ps1](scripts/inactive_users.ps1) | Disables accounts based on `LastLogonDate` and a configurable threshold, defaulting to 90 days. Sets the account description to include the disable date. |
+| [ZabbixInstall.bat](scripts/ZabbixInstall.bat) | Installs Zabbix Agent from a network share if the agent executable is not found. |
 
-### 6. Hybrid Identity & Cloud Integration
-Configured a hybrid IT environment by integrating the on-premises Active Directory with Microsoft Entra ID (formerly Azure AD) to enable centralized identity management and Single Sign-On (SSO) capabilities.
-* Deployed and configured **Microsoft Entra Connect Sync** on the local Windows Server.
-* Successfully synchronized local OUs and user attributes to the Microsoft 365 cloud environment, establishing a seamless Hybrid Identity architecture.
+Examples: [account creation](images/powershell_create_users.png), [CSV report](images/powershell_raport.png), [disabling inactive accounts](images/powershell_inactive_users.png).
 
-**Cloud Verification (Synced Users in Microsoft Entra admin center):**
-![Entra ID Synced Users](images/entra_id.png)
-
-**On-Premises Verification (Synchronization Service Operations):**
-![Local Sync Service](images/entra_connect_synchro.png)
-
-### 7. Infrastructure Monitoring (Zabbix)
-Deployed Zabbix to actively monitor the health, performance, and availability of the domain controller and client workstations.
-* **Automated Agent Deployment:** Configured automated, silent deployment of Zabbix Agent to Windows client machines using Group Policy Objects (GPO) and a custom startup batch script.
-* **Service Monitoring:** Utilized low-level discovery and applied specific Microsoft templates for deep-dive service monitoring and alerting.
-  * **Script:** [`ZabbixInstall.bat`](scripts/ZabbixInstall.bat)
-
-**Zabbix Dashboard & Host Monitoring:**
-![Zabbix Monitoring](images/zabbix_monitoring.png)
+The scripts were written for this lab and contain environment-specific settings.
+```

@@ -1,96 +1,68 @@
-# Laboratorium Infrastruktury IT i Tożsamości Hybrydowej (Enterprise IT)
+```markdown
+# AD-Lab — Active Directory, Entra ID i Zabbix
 
-## Przegląd Projektu
-Projekt ten to kompleksowa symulacja firmowej infrastruktury IT zbudowanej od podstaw. Zaprojektowałem, wdrożyłem i administrowałem wieloplatformową siecią wirtualną opartą na systemach Windows Server 2022, Windows 11 oraz Ubuntu Linux. 
+Domowe laboratorium, które zbudowałem do nauki administracji systemami IT. Skonfigurowałem domenę Active Directory, usługi sieciowe, zarządzanie stacjami przez GPO, synchronizację kont z Microsoft Entra ID oraz monitoring Zabbix. Powtarzalne zadania związane z kontami użytkowników przećwiczyłem w PowerShell.
 
-Głównym celem tego laboratorium jest zaprezentowanie praktycznych umiejętności z zakresu administracji systemami, konfiguracji sieci, scentralizowanego zarządzania tożsamością oraz automatycznego wdrażania oprogramowania w środowisku heterogenicznym.
+## Środowisko
 
----
+- **Wirtualizacja:** Oracle VirtualBox
+- **Systemy:** Windows Server 2022, Windows 11, Ubuntu Linux
+- **Sieć lokalna:** `192.168.10.0/24`
+- **Kontroler domeny:** `192.168.10.10`
+- **Domena laboratoryjna:** `bartek.com`
 
-## Architektura i Topologia
+![Schemat środowiska](images/Diagram.png)
 
-![Schemat Architektury Sieci](images/Diagram.png)
+### Active Directory i usługi sieciowe
 
-### Specyfikacja środowiska:
-* **Hypervisor:** Oracle VirtualBox
-* **Podsieć:** `192.168.10.0/24` (Sieć wewnętrzna)
-* **Kontroler Domeny:** Windows Server 2022 (Statyczny IP: `192.168.10.10`)
-* **Stacje robocze:** Windows 11 i Ubuntu Linux (Dynamiczne IP przydzielane z DHCP)
-* **Nazwa domeny:** `bartek.com`
+- Uruchomiłem kontroler domeny AD DS.
+- Utworzyłem strukturę OU dla użytkowników, kont administracyjnych, kont usługowych i stacji roboczych.
+- Dodałem użytkowników i grupy zabezpieczeń.
+- Skonfigurowałem DNS oraz autoryzowałem serwer DHCP z zakresem `192.168.10.100–192.168.10.200`.
 
----
+Zrzuty: [struktura AD](images/ad_structure.png), [zakres DHCP](images/dhcp_scope.png), [dzierżawy](images/dhcp_leases.png), [DNS](images/dns.png).
 
-## Kluczowe Wdrożenia i Technologie
+### GPO i dostęp do zasobów
 
-### 1. Usługi Domenowe Active Directory (AD DS)
-Zaprojektowałem logiczną, korporacyjną strukturę Jednostek Organizacyjnych (OU), aby skutecznie oddzielić konta administracyjne, konta usług, stacje robocze oraz użytkowników z poszczególnych działów (np. IT, HR, Dział Wideo).
-* Tworzyłem i zarządzałem cyklem życia użytkowników, grupami zabezpieczeń oraz jednostkami organizacyjnymi.
+- Skonfigurowałem instalację Google Chrome z pakietu MSI przez GPO.
+- Ustawiłem automatyczne mapowanie dysku sieciowego `Z:`.
+- Skonfigurowałem uprawnienia udziału i NTFS do udostępnionych zasobów.
 
-![Struktura Active Directory](images/ad_structure.png)
+Zrzuty: [instalacja oprogramowania](images/gpo_chrome.png), [mapowanie dysku](images/mapped_drive.png).
 
-### 2. Podstawowe Usługi Sieciowe (DHCP i DNS)
-Skonfigurowałem kluczowe role sieciowe, aby zapewnić płynną komunikację i dynamiczne przydzielanie adresów IP w domenie.
-* **Konfiguracja DHCP:** Autoryzowałem serwer DHCP ze zdefiniowanym zakresem IPv4 (`192.168.10.100` - `192.168.10.200`) do automatycznego przydzielania adresów IP stacjom klienckim.
-* **Konfiguracja DNS:** Utrzymywałem strefy wyszukiwania do przodu (Forward Lookup Zones), zapewniając poprawne rozwiązywanie rekordów A dla klientów Windows oraz statycznie dodanych hostów Linux.
+### Ubuntu w domenie
 
-**Zakres i Dzierżawy DHCP:**
-![Zakres DHCP](images/dhcp_scope.png)
-![Dzierżawy DHCP](images/dhcp_leases.png)
+- Dołączyłem Ubuntu do Active Directory przy użyciu `realmd` i `sssd`.
+- Sprawdziłem logowanie kontem domenowym.
 
-**Rekordy DNS:**
-![Konfiguracja DNS](images/dns.png)
+Zrzut: [Ubuntu w AD](images/ubuntu_ad.png).
 
-### 3. Obiekty Zasad Grupy (GPO) i Automatyzacja
-Wdrożyłem zasady scentralizowanego zarządzania, aby ustandaryzować środowisko, zautomatyzować zadania administracyjne i poprawić wygodę użytkowników (UX).
-* **Wdrażanie oprogramowania:** Skonfigurowałem cichą, automatyczną instalację sieciową oprogramowania (Google Chrome `.msi`) na wszystkich maszynach w jednostce OU Workstations.
-* **Udostępnianie zasobów:** Zautomatyzowałem mapowanie firmowych dysków sieciowych (Dysk `Z:`) przy użyciu preferencji zasad grupy (Drive Maps) w połączeniu z rygorystycznymi uprawnieniami NTFS i udostępniania.
+### Synchronizacja z Microsoft Entra ID
 
-**Konfiguracja mapowania dysku GPO:**
-![Mapowanie Dysku GPO](images/mapped_drive.png)
+- Zainstalowałem i skonfigurowałem Microsoft Entra Connect Sync.
+- Zsynchronizowałem konta użytkowników z wybranych OU do Entra ID.
+- Sprawdziłem wyniki synchronizacji lokalnie i w portalu Entra.
 
-**Automatyczne wdrażanie oprogramowania GPO:**
-![Wdrażanie Oprogramowania GPO](images/gpo_chrome.png)
+Zrzuty: [Entra Connect Sync](images/entra_connect_synchro.png), [konta w Entra ID](images/entra_id.png).
 
-### 4. Integracja Międzyplatformowa (Linux i Windows)
-Pomyślnie skonfigurowałem sieć heterogeniczną, podłączając stację roboczą Ubuntu Linux do domeny Microsoft Active Directory.
-* Wykorzystałem pakiety `realmd` i `sssd`, aby umożliwić bezproblemowe logowanie do systemu Linux przy użyciu scentralizowanych poświadczeń domeny AD, dowodząc umiejętności administracji systemami wieloplatformowymi.
+### Monitoring Zabbix
 
-![Logowanie Ubuntu do AD](images/ubuntu_ad.png)
+- Uruchomiłem monitoring kontrolera domeny i stacji roboczych.
+- Skonfigurowałem instalację agenta Zabbix na Windows przez skrypt startowy GPO.
+- Wykorzystałem szablony i automatyczne wykrywanie do monitorowania usług oraz sygnalizowania problemów.
 
-### 5. Automatyzacja Cyklu Życia Użytkownika (PowerShell)
-Napisałem i wdrożyłem modułowe skrypty PowerShell (dostępne w katalogu `/scripts`), aby zautomatyzować pełen cykl życia tożsamości pracownika, wykazując się wydajnością i dbałością o bezpieczeństwo.
-* **Onboarding (Tworzenie kont):** Zautomatyzowałem masowe tworzenie kont użytkowników z plików `.csv`, standaryzując konwencje nazewnictwa, UPN oraz przypisując konta do odpowiednich jednostek organizacyjnych (OU).
-  * **Skrypt:** [`Create_ADusers.ps1`](scripts/Create_ADusers.ps1)
-* **Raportowanie (Audyt):** Stworzyłem mechanizm eksportu czystych, sformatowanych raportów `.csv` o aktywnych pracownikach na potrzeby działu HR i audytów zarządczych.
-  * **Skrypt:** [`user_raport.ps1`](scripts/user_raport.ps1)
-* **Offboarding (Audyt bezpieczeństwa):** Zbudowałem skrypt bezpieczeństwa, który identyfikuje i automatycznie wyłącza przestarzałe/nieaktywne konta, zmniejszając powierzchnię ataku i dodając notatki ze znacznikami czasu dla innych administratorów.
-  * **Skrypt:** [`inactive_users.ps1`](scripts/inactive_users.ps1)
+Zrzut: [monitoring w Zabbix](images/zabbix_monitoring.png).
 
-**Masowe tworzenie użytkowników (Onboarding):**
-![Tworzenie Użytkowników PowerShell](images/powershell_create_users.png)
+## Skrypty
 
-**Raportowanie aktywnych użytkowników (Eksport):**
-![Raport PowerShell](images/powershell_raport.png)
+| Skrypt | Działanie |
+| --- | --- |
+| [Create_ADusers.ps1](scripts/Create_ADusers.ps1) | Tworzy konta z CSV w wybranym OU, generuje loginy i wymusza zmianę hasła przy pierwszym logowaniu. Pomija istniejące loginy. |
+| [user_raport.ps1](scripts/user_raport.ps1) | Eksportuje włączone konta z wybranego OU do CSV: imię, nazwisko, login i e-mail. |
+| [inactive_users.ps1](scripts/inactive_users.ps1) | Wyłącza konta na podstawie `LastLogonDate` i ustawionego progu, domyślnie 90 dni. Ustawia opis konta z datą blokady. |
+| [ZabbixInstall.bat](scripts/ZabbixInstall.bat) | Instaluje agenta Zabbix z udziału sieciowego, jeśli nie wykryje pliku wykonywalnego agenta. |
 
-**Czyszczenie martwych kont (Audyt bezpieczeństwa):**
-![Nieaktywni Użytkownicy PowerShell](images/powershell_inactive_users.png)
+Przykłady działania: [tworzenie kont](images/powershell_create_users.png), [raport CSV](images/powershell_raport.png), [wyłączanie kont](images/powershell_inactive_users.png).
 
-### 6. Tożsamość Hybrydowa i Integracja z Chmurą
-Skonfigurowałem hybrydowe środowisko IT, integrując lokalne Active Directory z Microsoft Entra ID (dawniej Azure AD), aby umożliwić scentralizowane zarządzanie tożsamością i logowanie jednokrotne (SSO).
-* Wdrożyłem i skonfigurowałem narzędzie **Microsoft Entra Connect Sync** na lokalnym serwerze Windows Server.
-* Pomyślnie zsynchronizowałem lokalne jednostki organizacyjne i atrybuty użytkowników do środowiska chmurowego Microsoft 365, ustanawiając spójną architekturę tożsamości hybrydowej.
-
-**Weryfikacja w Chmurze (Zsynchronizowani użytkownicy w portalu Microsoft Entra):**
-![Zsynchronizowani Użytkownicy Entra ID](images/entra_id.png)
-
-**Weryfikacja lokalna (Operacje usługi synchronizacji Entra Connect):**
-![Lokalna Usługa Synchronizacji](images/entra_connect_synchro.png)
-
-### 7. Monitorowanie Infrastruktury (Zabbix)
-Wdrożyłem system Zabbix do aktywnego monitorowania kondycji, wydajności i dostępności kontrolera domeny oraz stacji roboczych.
-* **Automatyzacja wdrażania agenta:** Skonfigurowałem ciche, automatyczne wdrażanie agenta Zabbix Agent na stacjach klienckich Windows za pomocą obiektów zasad grupy (GPO) i niestandardowego skryptu startowego (.bat).
-* **Monitorowanie usług:** Wykorzystałem mechanizmy automatycznego wykrywania (LLD) oraz wbudowane szablony do szczegółowego monitorowania kluczowych usług i alertowania.
-  * **Skrypt:** [`ZabbixInstall.bat`](scripts/ZabbixInstall.bat)
-
-**Panel Zabbix i Monitorowanie Hostów:**
-![Monitorowanie Zabbix](images/zabbix_monitoring.png)
+Skrypty przygotowałem na potrzeby laboratorium.
+```
