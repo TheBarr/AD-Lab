@@ -1,4 +1,3 @@
-```markdown
 # AD-Lab — Active Directory, Entra ID and Zabbix
 
 [Wersja polska](README_PL.md)
@@ -67,4 +66,3 @@ Screenshot: [Zabbix monitoring](images/zabbix_monitoring.png).
 Examples: [account creation](images/powershell_create_users.png), [CSV report](images/powershell_raport.png), [disabling inactive accounts](images/powershell_inactive_users.png).
 
 The scripts were written for this lab and contain environment-specific settings.
-```
